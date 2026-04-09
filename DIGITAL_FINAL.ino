@@ -23,13 +23,12 @@ float gain = 0.0;
 
 int freqShiftAll = A10;
 
-int thisIsJustATest = 22;
-int thisIsAnotherTest = 23;
-
-
 float freq1 = 262;
 float freq2 = 349.23;
 float freq3 = 392;
+
+int newRootNote = 0;
+float semitonesUpOrDown = 0.0;
 
 int shift = 0;
 
@@ -47,17 +46,17 @@ AudioMemory(12);
   waveform1.amplitude(0.2);  //amplitude (volume) can be 0 to 1 and this is usually a good volume for headphones
   waveform1.frequency(freq1);
 
-  waveform2.begin(WAVEFORM_SINE);
-  waveform2.amplitude(0.2);  //amplitude (volume) can be 0 to 1 and this is usually a good volume for headphones
-  waveform2.frequency(freq2);
+  // waveform2.begin(WAVEFORM_SINE);
+  // waveform2.amplitude(0.2);  //amplitude (volume) can be 0 to 1 and this is usually a good volume for headphones
+  // waveform2.frequency(freq2);
 
-  waveform3.begin(WAVEFORM_SINE);
-  waveform3.amplitude(0.2);  //amplitude (volume) can be 0 to 1 and this is usually a good volume for headphones
-  waveform3.frequency(freq3);
+  // waveform3.begin(WAVEFORM_SINE);
+  // waveform3.amplitude(0.2);  //amplitude (volume) can be 0 to 1 and this is usually a good volume for headphones
+  // waveform3.frequency(freq3);
 
   mixer1.gain(0,.2);
-  mixer1.gain(1,.2);
-  mixer1.gain(2,.2);
+  // mixer1.gain(1,.2);
+  // mixer1.gain(2,.2);
 
 }
 
@@ -70,11 +69,18 @@ void loop() {
   shift = map(analogRead(freqShiftAll), 0, 1023, 0, 500);
   // Serial.println(freq1, freq2, freq3);
 
-  waveform1.frequency(freq1 + shift);
-  waveform2.frequency(freq2 + shift);
-  waveform3.frequency(freq3 + shift);
+  newRootNote = freq1 * pow(2, semitonesUpOrDown/12.0);
+
+  waveform1.frequency(newRootNote);
+  // waveform2.frequency(freq2 + shift);
+  // waveform3.frequency(freq3 + shift);
   
   waveform1.begin(WAVEFORM_SINE);
-  waveform2.begin(WAVEFORM_SINE);
-  waveform3.begin(WAVEFORM_SINE);
+  // waveform2.begin(WAVEFORM_SINE);
+  // waveform3.begin(WAVEFORM_SINE);
+
+  semitonesUpOrDown++;
+  delay(500);
+
+
 }
