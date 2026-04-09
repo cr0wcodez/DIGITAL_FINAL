@@ -24,6 +24,7 @@ float gain = 0.0;
 int freqShiftAll = A10;
 
 int thisIsJustATest = 22;
+int thisIsAnotherTest = 23;
 
 
 float freq1 = 262;
