@@ -47,10 +47,12 @@ int allScales[6][8] = { { 0, 2, 4, 6, 7, 9, 11, 12 },
                         { 0, 1, 3, 5, 7, 8, 10, 12 } };
 
 
-int gainControlMaster = A13;
+float gains[8] = { 0, 0, 0, 0, 0, 0, 0, 0 };
+
+int gainControlMaster = A14;
 float gain = 0.0;
 
-int freqShiftAll = A10;
+int freqShiftAll = A15;
 
 float freq1 = 262;
 float freq2 = 349.23;
@@ -63,9 +65,12 @@ int newSeventh = 0;
 
 float semitonesUpOrDown = 0.0;
 
-int chooseScale = A12;
+int chooseScale = A16;
 
 int shift = 0;
+
+int numNoteToPlay = 0;
+int temp = A17;
 
 
 void setup() {
@@ -127,9 +132,29 @@ void loop() {
   // waveform3.begin(WAVEFORM_SINE);
   // waveform4.begin(WAVEFORM_SINE);
 
-  semitonesUpOrDown++;
-  if (semitonesUpOrDown >= 8) {
-    semitonesUpOrDown = 0;
+  numNoteToPlay = map(analogRead(temp), 0, 1023, 0, 8);
+  for (int i = 0; i < 8; i++) {
+    if (i <= numNotesToPlay) {
+      gains[i] = 0.1;
+    } else {
+      gains[i] = 0.0;
+    }
+  }
+
+  mixer1.gain(0, gains[0]);
+  mixer1.gain(1, gains[1]);
+  mixer1.gain(2, gains[2]);
+  mixer1.gain(3, gains[3]);
+  mixer2.gain(0, gains[4]);
+  mixer2.gain(1, gains[5]);
+  mixer2.gain(2, gains[6]);
+  mixer2.gain(3, gains[7]);
+
+
+
+  // semitonesUpOrDown++;
+  // if (semitonesUpOrDown >= 8) {
+  //   semitonesUpOrDown = 0;
   }
   delay(500);
 }
