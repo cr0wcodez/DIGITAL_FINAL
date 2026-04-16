@@ -69,7 +69,7 @@ int chooseScale = A16;
 
 int shift = 0;
 
-int numNoteToPlay = 0;
+int numNotesToPlay = 0;
 int temp = A17;
 
 
@@ -128,11 +128,15 @@ void loop() {
 
 
   waveform1.begin(WAVEFORM_SINE);
-  // waveform2.begin(WAVEFORM_SINE);
-  // waveform3.begin(WAVEFORM_SINE);
-  // waveform4.begin(WAVEFORM_SINE);
+  waveform2.begin(WAVEFORM_SINE);
+  waveform3.begin(WAVEFORM_SINE);
+  waveform4.begin(WAVEFORM_SINE);
+  waveform5.begin(WAVEFORM_SINE);
+  waveform6.begin(WAVEFORM_SINE);
+  waveform7.begin(WAVEFORM_SINE);
+  waveform8.begin(WAVEFORM_SINE);
 
-  numNoteToPlay = map(analogRead(temp), 0, 1023, 0, 8);
+  numNotesToPlay = map(analogRead(temp), 0, 1023, 0, 8);
   for (int i = 0; i < 8; i++) {
     if (i <= numNotesToPlay) {
       gains[i] = 0.1;
@@ -155,6 +159,5 @@ void loop() {
   // semitonesUpOrDown++;
   // if (semitonesUpOrDown >= 8) {
   //   semitonesUpOrDown = 0;
-  }
   delay(500);
 }
