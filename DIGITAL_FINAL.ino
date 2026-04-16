@@ -76,6 +76,9 @@ int shift = 0;
 int numNotesToPlay = 0;
 int temp = A17;
 
+int delayPot = A0;
+int delayTime = 0;
+
 
 void setup() {
   // need these
@@ -119,6 +122,7 @@ void loop() {
 
   scale = map(analogRead(chooseScale), 0, 1023, 0, 5);
 
+  
 
   newRoot = freq1 * pow(2, (allScales[scale][0]) / 12.0);
   newSecond = freq1 * pow(2, (allScales[scale][1]) / 12.0);
@@ -128,6 +132,7 @@ void loop() {
   newSixth = freq1 * pow(2, (allScales[scale][5]) / 12.0);
   newSeventh = freq1 * pow(2, (allScales[scale][6]) / 12.0);
   newOctave = freq1 * pow(2, (allScales[scale][7]) / 12.0);
+
 
   // waveform1.frequency(newRootNote);
   // waveform2.frequency(newThird);
@@ -143,8 +148,8 @@ void loop() {
   // waveform6.begin(.3, allScales[scale][5] , WAVEFORM_SINE);
   // waveform7.begin(.3, allScales[scale][6] , WAVEFORM_SINE);
   // waveform8.begin(.3, allScales[scale][7] , WAVEFORM_SINE);
-  
- 
+
+
 
 
   numNotesToPlay = map(analogRead(temp), 0, 1023, 0, 8);
@@ -155,28 +160,49 @@ void loop() {
       gains[i] = 0.0;
     }
   }
-  waveform1.begin(.3, newRoot , WAVEFORM_SINE);
-  waveform2.begin(.3, newSecond , WAVEFORM_SINE);
-  waveform3.begin(.3, newThird , WAVEFORM_SINE);
-  waveform4.begin(.3, newFourth , WAVEFORM_SINE);
-  waveform5.begin(.3, newFifth , WAVEFORM_SINE);
-  waveform6.begin(.3, newSixth , WAVEFORM_SINE);
-  waveform7.begin(.3, newSeventh , WAVEFORM_SINE);
-  waveform8.begin(.3, newOctave , WAVEFORM_SINE);
+  waveform1.begin(.3, newRoot + freqShiftAll, WAVEFORM_SINE);
+  waveform2.begin(.3, newSecond + freqShiftAll, WAVEFORM_SINE);
+  waveform3.begin(.3, newThird + freqShiftAll, WAVEFORM_SINE);
+  waveform4.begin(.3, newFourth + freqShiftAll, WAVEFORM_SINE);
+  waveform5.begin(.3, newFifth + freqShiftAll, WAVEFORM_SINE);
+  waveform6.begin(.3, newSixth + freqShiftAll, WAVEFORM_SINE);
+  waveform7.begin(.3, newSeventh + freqShiftAll, WAVEFORM_SINE);
+  waveform8.begin(.3, newOctave + freqShiftAll, WAVEFORM_SINE);
+
+  delayTime = map(analogRead(delayPot), 0, 1028, 0, 2000);
+  Serial.print(delayTime);
 
   mixer1.gain(0, gains[0]);
+  delay(delayTime);
+  mixer1.gain(0, 0);
+  delay(delayTime);
   mixer1.gain(1, gains[1]);
+  delay(delayTime);
+  mixer1.gain(1, 0);
+  delay(delayTime);
   mixer1.gain(2, gains[2]);
+  delay(delayTime);
+  mixer1.gain(2, 0);
+  delay(delayTime);
   mixer1.gain(3, gains[3]);
+  delay(delayTime);
+  mixer1.gain(3, 0);
+  delay(delayTime);
   mixer2.gain(0, gains[4]);
+  delay(delayTime);
+  mixer2.gain(0, 0);
+  delay(delayTime);
   mixer2.gain(1, gains[5]);
+  delay(delayTime);
+  mixer2.gain(1, 0);
+  delay(delayTime);
   mixer2.gain(2, gains[6]);
+  delay(delayTime);
+  mixer2.gain(2, 0);
+  delay(delayTime);
   mixer2.gain(3, gains[7]);
+  delay(delayTime);
+  mixer2.gain(3, 0);
+  delay(delayTime);
 
-
-
-  // semitonesUpOrDown++;
-  // if (semitonesUpOrDown >= 8) {
-  //   semitonesUpOrDown = 0;
-  delay(500);
 }
