@@ -51,34 +51,41 @@ int allScales[6][8] = { { 0, 2, 4, 6, 7, 9, 11, 12 },
 
 float gains[8] = { 0, 0, 0, 0, 0, 0, 0, 0 };
 
+int chords[4][5] = { { 0, 2, 4, 6, 7},
+                     { 1, 3, 5, 6, 7},
+                     { 2, 4, 5, 6, 7 },
+                     { 3, 5, 6, 7, 6 } };
+
+int notesInChord = 3;
+int maxNotesInChord = 4;
+float startingNoteFreq = 261.0;
+
 int gainControlMaster = A14;
 float gain = 0.0;
 
-int freqShiftAll = A15;
 
-float freq1 = 262;
-float freq2 = 349.23;
-float freq3 = 392;
+// int newRoot = 0;
+// int newSecond = 0;
+// int newThird = 0;
+// int newFourth = 0;
+// int newFifth = 0;
+// int newSixth = 0;
+// int newSeventh = 0;
+// int newOctave = 0;
 
-int newRoot = 0;
-int newSecond = 0;
-int newThird = 0;
-int newFourth = 0;
-int newFifth = 0;
-int newSixth = 0;
-int newSeventh = 0;
-int newOctave = 0;
+float semitonesUpOrDown = 0.0;
 
-// float semitonesUpOrDown = 0.0;
+int chooseScale = A15;
 
-int chooseScale = A16;
 
-int shift = 0;
+int chordLength = A16;
+int chordArp = 0;
+
 
 int numNotesToPlay = 0;
-int temp = A17;
+int temp = A0;
 
-int delayPot = A0;
+int delayPot = A17;
 int delayTime = 0;
 
 
@@ -91,17 +98,6 @@ void setup() {
   sgtl5000_1.enable();
   sgtl5000_1.volume(0.8);
 
-  // waveform1.begin(WAVEFORM_SINE);
-  // waveform1.amplitude(0.2);  //amplitude (volume) can be 0 to 1 and this is usually a good volume for headphones
-  // waveform1.frequency(freq1);
-
-  // waveform2.begin(WAVEFORM_SINE);
-  // waveform2.amplitude(0.2);  //amplitude (volume) can be 0 to 1 and this is usually a good volume for headphones
-  // waveform2.frequency(freq2);
-
-  // waveform3.begin(WAVEFORM_SINE);
-  // waveform3.amplitude(0.2);  //amplitude (volume) can be 0 to 1 and this is usually a good volume for headphones
-  // waveform3.frequency(freq3);
 
   mixer1.gain(0, .1);
   mixer1.gain(1, .1);
@@ -114,71 +110,29 @@ void setup() {
 }
 
 void loop() {
-  // waveform1.begin(.3, newRoot + freqShiftAll, WAVEFORM_SINE);
-  // waveform2.begin(.3, newSecond + freqShiftAll, WAVEFORM_SINE);
-  // waveform3.begin(.3, newThird + freqShiftAll, WAVEFORM_SINE);
-  // waveform4.begin(.3, newFourth + freqShiftAll, WAVEFORM_SINE);
-  // waveform5.begin(.3, newFifth + freqShiftAll, WAVEFORM_SINE);
-  // waveform6.begin(.3, newSixth + freqShiftAll, WAVEFORM_SINE);
-  // waveform7.begin(.3, newSeventh + freqShiftAll, WAVEFORM_SINE);
-  // waveform8.begin(.3, newOctave + freqShiftAll, WAVEFORM_SINE);
 
   gain = analogRead(gainControlMaster) / 1023.0 * 0.7;
   Serial.println(gain);
   sgtl5000_1.volume(gain);
 
-  shift = 0;  //map(analogRead(freqShiftAll), 0, 1023, 0, 500);
-  // Serial.println(freq1, freq2, freq3);
-
   scale = map(analogRead(chooseScale), 0, 1023, 0, 5);
 
+  chordArp = map(analogRead(chordLength), 0, 1023, 0, 4);
 
-
-  newRoot = freq1 * pow(2, (allScales[scale][0]) / 12.0);
-  newSecond = freq1 * pow(2, (allScales[scale][1]) / 12.0);
-  newThird = freq1 * pow(2, (allScales[scale][2]) / 12.0);
-  newFourth = freq1 * pow(2, (allScales[scale][3]) / 12.0);
-  newFifth = freq1 * pow(2, (allScales[scale][4]) / 12.0);
-  newSixth = freq1 * pow(2, (allScales[scale][5]) / 12.0);
-  newSeventh = freq1 * pow(2, (allScales[scale][6]) / 12.0);
-  newOctave = freq1 * pow(2, (allScales[scale][7]) / 12.0);
-
-
-
-  // waveform1.begin(.3, allScales[scale][0] , WAVEFORM_SINE);
-  // waveform2.begin(.3, allScales[scale][1] , WAVEFORM_SINE);
-  // waveform3.begin(.3, allScales[scale][2] , WAVEFORM_SINE);
-  // waveform4.begin(.3, allScales[scale][3] , WAVEFORM_SINE);
-  // waveform5.begin(.3, allScales[scale][4] , WAVEFORM_SINE);
-  // waveform6.begin(.3, allScales[scale][5] , WAVEFORM_SINE);
-  // waveform7.begin(.3, allScales[scale][6] , WAVEFORM_SINE);
-  // waveform8.begin(.3, allScales[scale][7] , WAVEFORM_SINE);
 
   delayTime = map(analogRead(delayPot), 0, 1028, 0, 2510);
-  Serial.print(delayTime);
+  // Serial.print(delayTime);
 
 
   numNotesToPlay = map(analogRead(temp), 0, 1023, 0, 8);
   for (int i = 0; i < 8; i++) {
     if (i <= numNotesToPlay) {
       gains[i] = 0.1;
+      delay(50);
     } else {
       gains[i] = 0.0;
     }
   }
-
-
-  // full progression Imaj7 - 4(add6) - 5(add6) - 4maj7
-  // I MAJ7 - scale[0] , scale[2], scale[4] , scale[6]
-  // IV ADD6 - scale[3], scale[5], scale[7], scale[1]
-  // V ADD6 - scale[4], scale[6], scale[1], scale[2]
-  // IV MAJ7 - scale[3], scale[7], scale[8], scale[2]
-
-  int chords[4] = { { 0, 2, 4, 6 },
-                    { 3, 5, 7, 1 },
-                    { 4, 6, 0, 2 },
-                    { 3, 5, 7, 2 } };
-
 
   // int allScales[6][8] = { { 0, 2, 4, 6, 7, 9, 11, 12 },
   //                       { 0, 2, 4, 5, 7, 9, 11, 12 },
@@ -187,15 +141,20 @@ void loop() {
   //                       { 0, 2, 3, 5, 7, 8, 10, 12 },
   //                       { 0, 1, 3, 5, 7, 8, 10, 12 } };
 
-  int notesInTheChord = 3;
-  int maxNotesInChord = 4;
-  float startingNoteFreq = 261.0;
 
-  for (int i = 0; i < maxNotesInChord; i++) {
+  playChord(chords[0][0], 0, 0);
+  delay(delayTime);
+  playChord(chords[0][1], 0, 1);
+  delay(delayTime);
+  playChord(chords[0][2], 0, 2);
+  delay(delayTime);
+  playChord(chords[0][3], 0, 3);
+  delay(delayTime);
 
-    oscillators[i]->frequency(getFreqFromRoot(startingNoteFreq, allScales[0][maj7Chord[i]]));
 
-    if (i < notesInChord) {
+  // turn on all the oscillators so we can hear them all
+  for (int i = 0; i < 4; i++) {
+    if (i < 4) {
       gains[i] = 0.1;
     } else {
       gains[i] = 0.0;
@@ -206,54 +165,96 @@ void loop() {
   oscillators[1]->amplitude(gains[1]);
   oscillators[2]->amplitude(gains[2]);
   oscillators[3]->amplitude(gains[3]);
+}
 
+void playChord(float _rootNoteFreq, int _scale, int _chord) {
+  // Serial.printf("rootNoteFreq: %d, scale: %d, chord: %d\n", _rootNoteFreq, _scale, _chord);
+  Serial.print("_rootNoteFreq: ");
+  Serial.print(_rootNoteFreq);
+  Serial.print(", _scale: ");
+  Serial.print(_scale);
+  Serial.print(", _chord: ");
+  Serial.print(_chord);
+  Serial.println();
 
-  // waveform1.begin(.3, newRoot + shift, WAVEFORM_SINE);
-  // // waveform2.begin(.3, newSecond + shift, WAVEFORM_SINE);
-  // waveform3.begin(.3, newThird + shift, WAVEFORM_SINE);
-  // // waveform4.begin(.3, newFourth + shift, WAVEFORM_SINE);
-  // waveform5.begin(.3, newFifth + shift, WAVEFORM_SINE);
-  // // waveform6.begin(.3, newSixth + shift, WAVEFORM_SINE);
-  // waveform7.begin(.3, newSeventh + shift, WAVEFORM_SINE);
-  // waveform8.begin(.3, newOctave + shift, WAVEFORM_SINE);
+  for (int i = 0; i < maxNotesInChord; i++) {
 
-  // delay(delayTime);
-
-  // waveform1.begin(0, newRoot + shift, WAVEFORM_SINE);
-  // // waveform2.begin(.3, newSecond + shift, WAVEFORM_SINE);
-  // waveform3.begin(0, newThird + shift, WAVEFORM_SINE);
-  // // waveform4.begin(.3, newFourth + shift, WAVEFORM_SINE);
-  // waveform5.begin(0, newFifth + shift, WAVEFORM_SINE);
-  // // waveform6.begin(.3, newSixth + shift, WAVEFORM_SINE);
-  // waveform7.begin(0, newSeventh + shift, WAVEFORM_SINE);
-  // waveform8.begin(0, newOctave + shift, WAVEFORM_SINE);
-
-
-  // delay(delayTime);
-
-  // waveform1.begin(.3, newRoot + shift, WAVEFORM_SINE);
-  // waveform2.begin(.3, newSecond + shift, WAVEFORM_SINE);
-  // // waveform3.begin(.3, newThird + shift, WAVEFORM_SINE);
-  // waveform4.begin(.3, newFourth + shift, WAVEFORM_SINE);
-  // // waveform5.begin(.3, newFifth + shift , WAVEFORM_SINE);
-  // waveform6.begin(.3, newSixth + shift, WAVEFORM_SINE);
-  // // waveform7.begin(.3, newSeventh + shift, WAVEFORM_SINE);
-  // waveform8.begin(.3, newOctave + shift, WAVEFORM_SINE);
-
-  // delay(delayTime);
-
-  // waveform1.begin(0, newRoot + shift, WAVEFORM_SINE);
-  // waveform2.begin(0, newSecond + shift, WAVEFORM_SINE);
-  // // waveform3.begin(.3, newThird + shift, WAVEFORM_SINE);
-  // waveform4.begin(0, newFourth + shift, WAVEFORM_SINE);
-  // // waveform5.begin(.3, newFifth + shift , WAVEFORM_SINE);
-  // waveform6.begin(0, newSixth + shift, WAVEFORM_SINE);
-  // // waveform7.begin(.3, newSeventh + shift, WAVEFORM_SINE);
-  // waveform8.begin(0, newOctave + shift, WAVEFORM_SINE);
-
-  // delay(delayTime);
+    oscillators[i]->frequency(getFreqFromRoot(_rootNoteFreq, allScales[_scale][chords[_chord][i]]));
+  }
 }
 
 float getFreqFromRoot(float root, float semitonesUpOrDown) {
-  return root * pow(2, (semitonesUpOrDown / 12.0);
+  return root * pow(2, (semitonesUpOrDown / 12.0));
 }
+
+
+// waveform1.begin(.3, newRoot + shift, WAVEFORM_SINE);
+// // waveform2.begin(.3, newSecond + shift, WAVEFORM_SINE);
+// waveform3.begin(.3, newThird + shift, WAVEFORM_SINE);
+// // waveform4.begin(.3, newFourth + shift, WAVEFORM_SINE);
+// waveform5.begin(.3, newFifth + shift, WAVEFORM_SINE);
+// // waveform6.begin(.3, newSixth + shift, WAVEFORM_SINE);
+// waveform7.begin(.3, newSeventh + shift, WAVEFORM_SINE);
+// waveform8.begin(.3, newOctave + shift, WAVEFORM_SINE);
+
+// delay(delayTime);
+
+// waveform1.begin(0, newRoot + shift, WAVEFORM_SINE);
+// // waveform2.begin(.3, newSecond + shift, WAVEFORM_SINE);
+// waveform3.begin(0, newThird + shift, WAVEFORM_SINE);
+// // waveform4.begin(.3, newFourth + shift, WAVEFORM_SINE);
+// waveform5.begin(0, newFifth + shift, WAVEFORM_SINE);
+// // waveform6.begin(.3, newSixth + shift, WAVEFORM_SINE);
+// waveform7.begin(0, newSeventh + shift, WAVEFORM_SINE);
+// waveform8.begin(0, newOctave + shift, WAVEFORM_SINE);
+
+
+// delay(delayTime);
+
+// waveform1.begin(.3, newRoot + shift, WAVEFORM_SINE);
+// waveform2.begin(.3, newSecond + shift, WAVEFORM_SINE);
+// // waveform3.begin(.3, newThird + shift, WAVEFORM_SINE);
+// waveform4.begin(.3, newFourth + shift, WAVEFORM_SINE);
+// // waveform5.begin(.3, newFifth + shift , WAVEFORM_SINE);
+// waveform6.begin(.3, newSixth + shift, WAVEFORM_SINE);
+// // waveform7.begin(.3, newSeventh + shift, WAVEFORM_SINE);
+// waveform8.begin(.3, newOctave + shift, WAVEFORM_SINE);
+
+// delay(delayTime);
+
+// waveform1.begin(0, newRoot + shift, WAVEFORM_SINE);
+// waveform2.begin(0, newSecond + shift, WAVEFORM_SINE);
+// // waveform3.begin(.3, newThird + shift, WAVEFORM_SINE);
+// waveform4.begin(0, newFourth + shift, WAVEFORM_SINE);
+// // waveform5.begin(.3, newFifth + shift , WAVEFORM_SINE);
+// waveform6.begin(0, newSixth + shift, WAVEFORM_SINE);
+// // waveform7.begin(.3, newSeventh + shift, WAVEFORM_SINE);
+// waveform8.begin(0, newOctave + shift, WAVEFORM_SINE);
+
+// delay(delayTime);
+
+
+// idk what this is down here im not using it tho
+
+// waveform1.begin(.3, allScales[scale][0] , WAVEFORM_SINE);
+// waveform2.begin(.3, allScales[scale][1] , WAVEFORM_SINE);
+// waveform3.begin(.3, allScales[scale][2] , WAVEFORM_SINE);
+// waveform4.begin(.3, allScales[scale][3] , WAVEFORM_SINE);
+// waveform5.begin(.3, allScales[scale][4] , WAVEFORM_SINE);
+// waveform6.begin(.3, allScales[scale][5] , WAVEFORM_SINE);
+// waveform7.begin(.3, allScales[scale][6] , WAVEFORM_SINE);
+// waveform8.begin(.3, allScales[scale][7] , WAVEFORM_SINE);
+
+// what is this
+
+// waveform1.begin(WAVEFORM_SINE);
+// waveform1.amplitude(0.2);  //amplitude (volume) can be 0 to 1 and this is usually a good volume for headphones
+// waveform1.frequency(freq1);
+
+// waveform2.begin(WAVEFORM_SINE);
+// waveform2.amplitude(0.2);  //amplitude (volume) can be 0 to 1 and this is usually a good volume for headphones
+// waveform2.frequency(freq2);
+
+// waveform3.begin(WAVEFORM_SINE);
+// waveform3.amplitude(0.2);  //amplitude (volume) can be 0 to 1 and this is usually a good volume for headphones
+// waveform3.frequency(freq3);
