@@ -32,6 +32,8 @@ AudioConnection patchCord12(mixer3, 0, i2s1, 1);
 AudioControlSGTL5000 sgtl5000_1;  //xy=893,572
 // GUItool: end automatically generated code
 
+AudioSynthWaveform* oscillators[4] = { &waveform1, &waveform2, &waveform3, &waveform4 };
+
 // int intervalsLydianScale[8] = {0, 2, 4, 6, 7, 9, 11, 12};
 // int intervalsMajorScale[8] = {0, 2, 4, 5, 7, 9, 11, 12};
 // int intervalsMixoScale[8] = {0, 2, 4, 5, 7, 9, 10, 12};
@@ -112,17 +114,25 @@ void setup() {
 }
 
 void loop() {
+  // waveform1.begin(.3, newRoot + freqShiftAll, WAVEFORM_SINE);
+  // waveform2.begin(.3, newSecond + freqShiftAll, WAVEFORM_SINE);
+  // waveform3.begin(.3, newThird + freqShiftAll, WAVEFORM_SINE);
+  // waveform4.begin(.3, newFourth + freqShiftAll, WAVEFORM_SINE);
+  // waveform5.begin(.3, newFifth + freqShiftAll, WAVEFORM_SINE);
+  // waveform6.begin(.3, newSixth + freqShiftAll, WAVEFORM_SINE);
+  // waveform7.begin(.3, newSeventh + freqShiftAll, WAVEFORM_SINE);
+  // waveform8.begin(.3, newOctave + freqShiftAll, WAVEFORM_SINE);
 
   gain = analogRead(gainControlMaster) / 1023.0 * 0.7;
   Serial.println(gain);
   sgtl5000_1.volume(gain);
 
-  shift = map(analogRead(freqShiftAll), 0, 1023, 0, 500);
+  shift = 0;  //map(analogRead(freqShiftAll), 0, 1023, 0, 500);
   // Serial.println(freq1, freq2, freq3);
 
   scale = map(analogRead(chooseScale), 0, 1023, 0, 5);
 
-  
+
 
   newRoot = freq1 * pow(2, (allScales[scale][0]) / 12.0);
   newSecond = freq1 * pow(2, (allScales[scale][1]) / 12.0);
@@ -134,11 +144,6 @@ void loop() {
   newOctave = freq1 * pow(2, (allScales[scale][7]) / 12.0);
 
 
-  // waveform1.frequency(newRootNote);
-  // waveform2.frequency(newThird);
-  // waveform3.frequency(newFifth);
-  // waveform4.frequency(newSeventh);
-
 
   // waveform1.begin(.3, allScales[scale][0] , WAVEFORM_SINE);
   // waveform2.begin(.3, allScales[scale][1] , WAVEFORM_SINE);
@@ -149,7 +154,8 @@ void loop() {
   // waveform7.begin(.3, allScales[scale][6] , WAVEFORM_SINE);
   // waveform8.begin(.3, allScales[scale][7] , WAVEFORM_SINE);
 
-
+  delayTime = map(analogRead(delayPot), 0, 1028, 0, 2510);
+  Serial.print(delayTime);
 
 
   numNotesToPlay = map(analogRead(temp), 0, 1023, 0, 8);
@@ -160,49 +166,94 @@ void loop() {
       gains[i] = 0.0;
     }
   }
-  waveform1.begin(.3, newRoot + freqShiftAll, WAVEFORM_SINE);
-  waveform2.begin(.3, newSecond + freqShiftAll, WAVEFORM_SINE);
-  waveform3.begin(.3, newThird + freqShiftAll, WAVEFORM_SINE);
-  waveform4.begin(.3, newFourth + freqShiftAll, WAVEFORM_SINE);
-  waveform5.begin(.3, newFifth + freqShiftAll, WAVEFORM_SINE);
-  waveform6.begin(.3, newSixth + freqShiftAll, WAVEFORM_SINE);
-  waveform7.begin(.3, newSeventh + freqShiftAll, WAVEFORM_SINE);
-  waveform8.begin(.3, newOctave + freqShiftAll, WAVEFORM_SINE);
 
-  delayTime = map(analogRead(delayPot), 0, 1028, 0, 2000);
-  Serial.print(delayTime);
 
-  mixer1.gain(0, gains[0]);
-  delay(delayTime);
-  mixer1.gain(0, 0);
-  delay(delayTime);
-  mixer1.gain(1, gains[1]);
-  delay(delayTime);
-  mixer1.gain(1, 0);
-  delay(delayTime);
-  mixer1.gain(2, gains[2]);
-  delay(delayTime);
-  mixer1.gain(2, 0);
-  delay(delayTime);
-  mixer1.gain(3, gains[3]);
-  delay(delayTime);
-  mixer1.gain(3, 0);
-  delay(delayTime);
-  mixer2.gain(0, gains[4]);
-  delay(delayTime);
-  mixer2.gain(0, 0);
-  delay(delayTime);
-  mixer2.gain(1, gains[5]);
-  delay(delayTime);
-  mixer2.gain(1, 0);
-  delay(delayTime);
-  mixer2.gain(2, gains[6]);
-  delay(delayTime);
-  mixer2.gain(2, 0);
-  delay(delayTime);
-  mixer2.gain(3, gains[7]);
-  delay(delayTime);
-  mixer2.gain(3, 0);
-  delay(delayTime);
+  // full progression Imaj7 - 4(add6) - 5(add6) - 4maj7
+  // I MAJ7 - scale[0] , scale[2], scale[4] , scale[6]
+  // IV ADD6 - scale[3], scale[5], scale[7], scale[1]
+  // V ADD6 - scale[4], scale[6], scale[1], scale[2]
+  // IV MAJ7 - scale[3], scale[7], scale[8], scale[2]
 
+  int chords[4] = { { 0, 2, 4, 6 },
+                    { 3, 5, 7, 1 },
+                    { 4, 6, 0, 2 },
+                    { 3, 5, 7, 2 } };
+
+
+  // int allScales[6][8] = { { 0, 2, 4, 6, 7, 9, 11, 12 },
+  //                       { 0, 2, 4, 5, 7, 9, 11, 12 },
+  //                       { 0, 2, 4, 5, 7, 9, 10, 12 },
+  //                       { 0, 2, 3, 5, 7, 9, 10, 12 },
+  //                       { 0, 2, 3, 5, 7, 8, 10, 12 },
+  //                       { 0, 1, 3, 5, 7, 8, 10, 12 } };
+
+  int notesInTheChord = 3;
+  int maxNotesInChord = 4;
+  float startingNoteFreq = 261.0;
+
+  for (int i = 0; i < maxNotesInChord; i++) {
+
+    oscillators[i]->frequency(getFreqFromRoot(startingNoteFreq, allScales[0][maj7Chord[i]]));
+
+    if (i < notesInChord) {
+      gains[i] = 0.1;
+    } else {
+      gains[i] = 0.0;
+    }
+  }
+
+  oscillators[0]->amplitude(gains[0]);
+  oscillators[1]->amplitude(gains[1]);
+  oscillators[2]->amplitude(gains[2]);
+  oscillators[3]->amplitude(gains[3]);
+
+
+  // waveform1.begin(.3, newRoot + shift, WAVEFORM_SINE);
+  // // waveform2.begin(.3, newSecond + shift, WAVEFORM_SINE);
+  // waveform3.begin(.3, newThird + shift, WAVEFORM_SINE);
+  // // waveform4.begin(.3, newFourth + shift, WAVEFORM_SINE);
+  // waveform5.begin(.3, newFifth + shift, WAVEFORM_SINE);
+  // // waveform6.begin(.3, newSixth + shift, WAVEFORM_SINE);
+  // waveform7.begin(.3, newSeventh + shift, WAVEFORM_SINE);
+  // waveform8.begin(.3, newOctave + shift, WAVEFORM_SINE);
+
+  // delay(delayTime);
+
+  // waveform1.begin(0, newRoot + shift, WAVEFORM_SINE);
+  // // waveform2.begin(.3, newSecond + shift, WAVEFORM_SINE);
+  // waveform3.begin(0, newThird + shift, WAVEFORM_SINE);
+  // // waveform4.begin(.3, newFourth + shift, WAVEFORM_SINE);
+  // waveform5.begin(0, newFifth + shift, WAVEFORM_SINE);
+  // // waveform6.begin(.3, newSixth + shift, WAVEFORM_SINE);
+  // waveform7.begin(0, newSeventh + shift, WAVEFORM_SINE);
+  // waveform8.begin(0, newOctave + shift, WAVEFORM_SINE);
+
+
+  // delay(delayTime);
+
+  // waveform1.begin(.3, newRoot + shift, WAVEFORM_SINE);
+  // waveform2.begin(.3, newSecond + shift, WAVEFORM_SINE);
+  // // waveform3.begin(.3, newThird + shift, WAVEFORM_SINE);
+  // waveform4.begin(.3, newFourth + shift, WAVEFORM_SINE);
+  // // waveform5.begin(.3, newFifth + shift , WAVEFORM_SINE);
+  // waveform6.begin(.3, newSixth + shift, WAVEFORM_SINE);
+  // // waveform7.begin(.3, newSeventh + shift, WAVEFORM_SINE);
+  // waveform8.begin(.3, newOctave + shift, WAVEFORM_SINE);
+
+  // delay(delayTime);
+
+  // waveform1.begin(0, newRoot + shift, WAVEFORM_SINE);
+  // waveform2.begin(0, newSecond + shift, WAVEFORM_SINE);
+  // // waveform3.begin(.3, newThird + shift, WAVEFORM_SINE);
+  // waveform4.begin(0, newFourth + shift, WAVEFORM_SINE);
+  // // waveform5.begin(.3, newFifth + shift , WAVEFORM_SINE);
+  // waveform6.begin(0, newSixth + shift, WAVEFORM_SINE);
+  // // waveform7.begin(.3, newSeventh + shift, WAVEFORM_SINE);
+  // waveform8.begin(0, newOctave + shift, WAVEFORM_SINE);
+
+  // delay(delayTime);
+}
+
+float getFreqFromRoot(float root, float semitonesUpOrDown) {
+  return root * pow(2, (semitonesUpOrDown / 12.0);
 }
