@@ -40,6 +40,7 @@ AudioSynthWaveform* oscillators[4] = { &waveform1, &waveform2, &waveform3, &wave
 // int intervalsDorianScale[8] = {0, 2, 3, 5, 7, 9, 10, 12};
 // int intervalsMinorScale[8] = {0, 2, 3, 5, 7, 8, 10, 12};
 // int intervalsPhrygianScale[8] = {0, 1, 3, 5, 7, 8, 10, 12};
+
 int scale = 0;
 int allScales[6][8] = { { 0, 2, 4, 6, 7, 9, 11, 12 },
                         { 0, 2, 4, 5, 7, 9, 11, 12 },
@@ -63,15 +64,6 @@ float startingNoteFreq = 261.0;
 int gainControlMaster = A14;
 float gain = 0.0;
 
-
-// int newRoot = 0;
-// int newSecond = 0;
-// int newThird = 0;
-// int newFourth = 0;
-// int newFifth = 0;
-// int newSixth = 0;
-// int newSeventh = 0;
-// int newOctave = 0;
 
 float semitonesUpOrDown = 0.0;
 
@@ -121,7 +113,6 @@ void loop() {
 
 
   delayTime = map(analogRead(delayPot), 0, 1028, 0, 2510);
-  // Serial.print(delayTime);
 
 
   numNotesToPlay = map(analogRead(temp), 0, 1023, 0, 8);
