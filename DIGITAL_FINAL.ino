@@ -41,6 +41,13 @@ AudioSynthWaveform* oscillators[4] = { &waveform1, &waveform2, &waveform3, &wave
 // int intervalsMinorScale[8] = {0, 2, 3, 5, 7, 8, 10, 12};
 // int intervalsPhrygianScale[8] = {0, 1, 3, 5, 7, 8, 10, 12};
 
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+
+
 int scale = 0;
 int allScales[6][8] = { { 0, 2, 4, 6, 7, 9, 11, 12 },
                         { 0, 2, 4, 5, 7, 9, 11, 12 },
@@ -48,6 +55,11 @@ int allScales[6][8] = { { 0, 2, 4, 6, 7, 9, 11, 12 },
                         { 0, 2, 3, 5, 7, 9, 10, 12 },
                         { 0, 2, 3, 5, 7, 8, 10, 12 },
                         { 0, 1, 3, 5, 7, 8, 10, 12 } };
+
+
+int allScalesFreqs[6][8] = { {}          }
+
+
 
 
 float gains[8] = { 0, 0, 0, 0, 0, 0, 0, 0 };
@@ -81,6 +93,8 @@ int delayPot = A17;
 int delayTime = 0;
 
 
+float rootFreqs = { 261.63 , 277.18, 293.67 , 311.13, 329.63, 349.23, 369.99, 392.0, 415.30, 440.0, 466.16, 493.88};
+
 void setup() {
   // need these
   Serial.begin(9600);
@@ -100,6 +114,7 @@ void setup() {
   mixer2.gain(2, .1);
   mixer2.gain(3, .1);
 }
+
 
 void loop() {
 
@@ -160,23 +175,31 @@ void loop() {
 
 void playChord(float _rootNoteFreq, int _scale, int _chord) {
   // Serial.printf("rootNoteFreq: %d, scale: %d, chord: %d\n", _rootNoteFreq, _scale, _chord);
-  Serial.print("_rootNoteFreq: ");
-  Serial.print(_rootNoteFreq);
-  Serial.print(", _scale: ");
-  Serial.print(_scale);
-  Serial.print(", _chord: ");
-  Serial.print(_chord);
-  Serial.println();
 
-  for (int i = 0; i < maxNotesInChord; i++) {
 
-    oscillators[i]->frequency(getFreqFromRoot(_rootNoteFreq, allScales[_scale][chords[_chord][i]]));
-  }
+
+
+void happySong() {
+
+  
 }
 
-float getFreqFromRoot(float root, float semitonesUpOrDown) {
-  return root * pow(2, (semitonesUpOrDown / 12.0));
-}
+
+
+
+
+
+
+
+//   for (int i = 0; i < maxNotesInChord; i++) {
+
+//     oscillators[i]->frequency(getFreqFromRoot(_rootNoteFreq, allScales[_scale][chords[_chord][i]]));
+//   }
+// }
+
+// float getFreqFromRoot(float root, float semitonesUpOrDown) {
+//   return root * pow(2, (semitonesUpOrDown / 12.0));
+// }
 
 
 // waveform1.begin(.3, newRoot + shift, WAVEFORM_SINE);
